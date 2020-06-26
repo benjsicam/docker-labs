@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+
+  redis:
+    image: "redis:6.0.5-alpine"
+    networks:
+      - "redis-net"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'redis-cli PING'"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: "on-failure"
+
+  redis-insight:
+    image: "redislabs/redisinsight:1.6.1"
+    networks:
+      - "redis-net"
+    ports: 
+      - "8001:8001"
+    depends_on:
+      - "redis"
+    volumes:
+      - redisinsight:/db
+    restart: "on-failure"
+
+networks:
+  redis-net:
+
+volumes:
+  redis:
+  redisinsight:
